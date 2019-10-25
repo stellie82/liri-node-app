@@ -3,6 +3,8 @@ require("dotenv").config();
 const Spotify = require("node-spotify-api");
 const axios = require("axios");
 const keys = require("./key.js");
+const moment = require("moment");
+moment().format();
 
 var spotify = new Spotify(keys.spotify);
 
@@ -15,7 +17,7 @@ console.log(userInputTrucated);
 
 switch (searchType) {
     case "concert-this":
-        spotify();
+        concertSearch(userInputTrucated);
         break;
     case "spotify-this-song":
         songSearch(userInput);
@@ -28,6 +30,58 @@ switch (searchType) {
         break;
 }
 
+
+// BANDS IN TOWN CONCERT SEARCH
+// node liri.js concert-this <artist/band name here>
+// This will search the Bands in Town Artist Events API ("https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp") for an artist and render the following information about each event to the terminal:
+
+
+// Name of the venue
+// Venue location
+// Date of the Event (use moment to format this as "MM/DD/YYYY")
+
+function concertSearch() {
+
+    // Then run a request with axios to the OMDB API with the movie specified
+    var bandsInTownURL = "https://rest.bandsintown.com/artists/" + userInputTrucated + "/events?app_id=codingbootcamp";
+
+    // This line is just to help us debug against the actual URL.
+    console.log(bandsInTownURL);
+
+    axios.get(bandsInTownURL).then(
+        function (response) {
+            for (i = 0; i < response.data.length; i++){
+                console.log("Artist: " + response.data[i].lineup);
+                let dateTime = response.data[i].datetime;
+                let updatedDateTime = moment(dateTime, "YYYY-MM-DDTHH:mm:ss").format("MM/DD/YYYY");
+                console.log("Event date: " + updatedDateTime);
+                console.log("Venue name: " + response.data[i].venue.name);
+                console.log("Venue location: " + response.data[i].venue.city + ", " + response.data[i].venue.country);
+            }
+        })
+        .catch(function (error) {
+            if (error.response) {
+                console.log("---------------Data---------------");
+                console.log(error.response.data);
+                console.log("---------------Status---------------");
+                console.log(error.response.status);
+                console.log("---------------Status---------------");
+                console.log(error.response.headers);
+            } else if (error.request) {
+                console.log(error.request);
+            } else {
+                console.log("Error", error.message);
+            }
+            console.log(error.config);
+
+            // If the user doesn't type a movie in, the program will output data for the movie 'Mr. Nobody.'
+            // If you haven't watched "Mr. Nobody," then you should: http://www.imdb.com/title/tt0485947/
+            // It's on Netflix!
+        });
+
+
+
+}
 
 
 // SPOTIFY SONG SEARCH
