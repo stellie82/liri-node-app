@@ -42,10 +42,10 @@ switch (searchType) {
 // Venue location
 // Date of the Event (use moment to format this as "MM/DD/YYYY")
 
-function concertSearch() {
+function concertSearch(userConcert) {
 
     // Then run a request with axios to the OMDB API with the movie specified
-    var bandsInTownURL = "https://rest.bandsintown.com/artists/" + userInputTrucated + "/events?app_id=codingbootcamp";
+    var bandsInTownURL = "https://rest.bandsintown.com/artists/" + userConcert + "/events?app_id=codingbootcamp";
 
     axios.get(bandsInTownURL).then(
         function (response) {
@@ -86,10 +86,10 @@ function concertSearch() {
 // A preview link of the song from Spotify
 // The album that the song is from
 
-function songSearch(searchDescription) {
+function songSearch(userSong) {
     spotify.search({
         type: "track",
-        query: searchDescription
+        query: userSong
     }, function (err, data) {
         if (err) {
             return console.log("Error occurred: " + err);
@@ -122,10 +122,10 @@ function songSearch(searchDescription) {
 //    * Plot of the movie.
 //    * Actors in the movie.
 
-function movieSearch() {
+function movieSearch(userMovie) {
 
     // Then run a request with axios to the OMDB API with the movie specified
-    var omdbURL = "http://www.omdbapi.com/?t=" + userInputTrucated + "&apikey=trilogy";
+    var omdbURL = "http://www.omdbapi.com/?t=" + userMovie + "&apikey=trilogy";
 
     axios.get(omdbURL).then(
         function (response) {
@@ -189,29 +189,28 @@ function doWhatItSays() {
         console.log(data);
         console.log(data.length);
 
-        for (i = 0; i < data.length; i++) {
-            let random = data[i].split(",");
-            let randomSearchType = random[0];
-            let randomSearchDescription = random[1].replace(/\"/g, "");
-            let randomSearchTruncated = random[1].replace(/ /g,"+").replace(/\"/g, "");
-            // console.log(randomSearchTruncated);
-            // console.log("Random search type: " + randomSearchType);
-            // console.log("Random search description: " + randomSearchDescription);
-            // console.log("Random search description: " + randomSearchTruncated);
-            // console.log("----------------------------------------------------------");
+        let randomIndex = Math.floor(Math.random() * data.length);
+        console.log(randomIndex);
 
-            switch (randomSearchType) {
-                case "concert-this":
-                    concertSearch(randomSearchTruncated);
-                    break;
-                case "spotify-this-song":
-                    songSearch(randomSearchDescription);
-                    break;
-                case "movie-this":
-                    movieSearch(randomSearchTruncated);
-                    break;
-            }
+        // for (i = 0; i < data.length; i++) {
+        let randomPicker = data[randomIndex].split(",");
+        console.log(randomPicker);
+        let randomSearchType = randomPicker[0];
+        let randomSearchDescription = randomPicker[1].replace(/\"/g, "");
+        let randomSearchTruncated = randomPicker[1].replace(/ /g, "+").replace(/\"/g, "");
+
+        switch (randomSearchType) {
+            case "concert-this":
+                concertSearch(randomSearchTruncated);
+                break;
+            case "spotify-this-song":
+                songSearch(randomSearchDescription);
+                break;
+            case "movie-this":
+                movieSearch(randomSearchTruncated);
+                break;
         }
+        // }
     });
 }
 
