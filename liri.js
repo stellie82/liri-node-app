@@ -4,7 +4,8 @@ const Spotify = require("node-spotify-api");
 const axios = require("axios");
 const keys = require("./key.js");
 const moment = require("moment");
-moment().format();
+const file = require("file-system");
+const fs = require("fs");
 
 var spotify = new Spotify(keys.spotify);
 
@@ -12,6 +13,7 @@ var searchType = process.argv[2];
 var args = process.argv.slice(3);
 var userInput = args.join(" ");
 var userInputTrucated = args.join("+");
+console.log(args);
 console.log(userInput);
 console.log(userInputTrucated);
 
@@ -26,7 +28,7 @@ switch (searchType) {
         movieSearch(userInputTrucated);
         break;
     case "do-what-it-says":
-        spotify();
+        doWhatItSays();
         break;
 }
 
@@ -45,18 +47,16 @@ function concertSearch() {
     // Then run a request with axios to the OMDB API with the movie specified
     var bandsInTownURL = "https://rest.bandsintown.com/artists/" + userInputTrucated + "/events?app_id=codingbootcamp";
 
-    // This line is just to help us debug against the actual URL.
-    console.log(bandsInTownURL);
-
     axios.get(bandsInTownURL).then(
         function (response) {
-            for (i = 0; i < response.data.length; i++){
+            for (i = 0; i < response.data.length; i++) {
                 console.log("Artist: " + response.data[i].lineup);
                 let dateTime = response.data[i].datetime;
                 let updatedDateTime = moment(dateTime, "YYYY-MM-DDTHH:mm:ss").format("MM/DD/YYYY");
                 console.log("Event date: " + updatedDateTime);
                 console.log("Venue name: " + response.data[i].venue.name);
                 console.log("Venue location: " + response.data[i].venue.city + ", " + response.data[i].venue.country);
+                console.log("----------------------------------------------------------");
             }
         })
         .catch(function (error) {
@@ -73,14 +73,7 @@ function concertSearch() {
                 console.log("Error", error.message);
             }
             console.log(error.config);
-
-            // If the user doesn't type a movie in, the program will output data for the movie 'Mr. Nobody.'
-            // If you haven't watched "Mr. Nobody," then you should: http://www.imdb.com/title/tt0485947/
-            // It's on Netflix!
         });
-
-
-
 }
 
 
@@ -109,8 +102,8 @@ function songSearch(searchDescription) {
             console.log("Song name: " + data.tracks.items[i].name);
             console.log("Spotify preview link: " + data.tracks.items[i].preview_url);
             console.log("Album: " + data.tracks.items[i].album.name);
+            console.log("----------------------------------------------------------");
         }
-
         // If no song is provided then your program will default to "The Sign" by Ace of Base.
     });
 }
@@ -133,9 +126,6 @@ function movieSearch() {
 
     // Then run a request with axios to the OMDB API with the movie specified
     var omdbURL = "http://www.omdbapi.com/?t=" + userInputTrucated + "&apikey=trilogy";
-
-    // This line is just to help us debug against the actual URL.
-    console.log(omdbURL);
 
     axios.get(omdbURL).then(
         function (response) {
@@ -177,6 +167,56 @@ function movieSearch() {
             // If you haven't watched "Mr. Nobody," then you should: http://www.imdb.com/title/tt0485947/
             // It's on Netflix!
         });
-
-
 }
+
+
+
+// DO WHAT LIRI SAYS
+// node liri.js do-what-it-says
+// Using the fs Node package, LIRI will take the text inside of random.txt and then use it to call one of LIRI's commands.
+
+// It should run spotify-this-song for "I Want it That Way," as follows the text in random.txt.
+// Edit the text in random.txt to test out the feature for movie-this and concert-this.
+
+function doWhatItSays() {
+    // We will read the existing bank file
+    fs.readFile("random.txt", "utf8", function (err, data) {
+        if (err) {
+            return console.log(err);
+        }
+        // console.log(data);
+        data = data.split("\n");
+        console.log(data);
+        console.log(data.length);
+
+        for (i = 0; i < data.length; i++) {
+            let random = data[i].split(",");
+            let randomSearchType = random[0];
+            let randomSearchDescription = random[1].replace(/\"/g, "");
+            let randomSearchTruncated = random[1].replace(/ /g,"+").replace(/\"/g, "");
+            // console.log(randomSearchTruncated);
+            // console.log("Random search type: " + randomSearchType);
+            // console.log("Random search description: " + randomSearchDescription);
+            // console.log("Random search description: " + randomSearchTruncated);
+            // console.log("----------------------------------------------------------");
+
+            switch (randomSearchType) {
+                case "concert-this":
+                    concertSearch(randomSearchTruncated);
+                    break;
+                case "spotify-this-song":
+                    songSearch(randomSearchDescription);
+                    break;
+                case "movie-this":
+                    movieSearch(randomSearchTruncated);
+                    break;
+            }
+        }
+    });
+}
+
+
+// finish up default searches
+// omdb key
+// errors
+// comments
