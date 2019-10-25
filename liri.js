@@ -1,25 +1,36 @@
 require("dotenv").config();
 
-var Spotify = require("node-spotify-api");
-var Axios = require("axios");
-var keys = require("./key.js");
+const Spotify = require("node-spotify-api");
+const axios = require("axios");
+const keys = require("./key.js");
 
 var spotify = new Spotify(keys.spotify);
 
 var searchType = process.argv[2];
 var args = process.argv.slice(3);
-var searchDescription = args.join(" ");
+var userInput = args.join(" ");
+var userInputTrucated = args.join("+");
+console.log(userInput);
+console.log(userInputTrucated);
 
-// var searchDescription = "";
+switch (searchType) {
+    case "concert-this":
+        spotify();
+        break;
+    case "spotify-this-song":
+        songSearch(userInput);
+        break;
+    case "movie-this":
+        movieSearch(userInputTrucated);
+        break;
+    case "do-what-it-says":
+        spotify();
+        break;
+}
 
-// for (var i = 3; i < nodeArgs.length; i++) {
-//   if (i > 3 && i < nodeArgs.length) {
-//     searchDescription = searchDescription + "+" + nodeArgs[i];
-//   } else {
-//     searchDescription += nodeArgs[i];
-//   }
-// }
 
+
+// SPOTIFY SONG SEARCH
 // node liri.js spotify-this-song '<song name here>'
 // This will show the following information about the song in your terminal/bash window
 
@@ -28,22 +39,7 @@ var searchDescription = args.join(" ");
 // A preview link of the song from Spotify
 // The album that the song is from
 
-// switch (searchType) {
-//     case "concert-this":
-//         spotify(searchDescription);
-//         break;
-//     case "spotify-this-song":
-//         spotify;
-//         break;
-//     case "movie-this":
-//         spotify(searchDescription);
-//         break;
-//     case "do-what-it-says":
-//         spotify(searchDescription);
-//         break;
-// }
-
-// function spotify() {
+function songSearch(searchDescription) {
     spotify.search({
         type: "track",
         query: searchDescription
@@ -51,7 +47,7 @@ var searchDescription = args.join(" ");
         if (err) {
             return console.log("Error occurred: " + err);
         }
-        
+
         for (i = 0; i < data.tracks.items.length; i++) {
             for (j = 0; j < data.tracks.items[i].artists.length; j++) {
                 console.log("Artists: " + data.tracks.items[i].artists[j].name);
@@ -60,5 +56,73 @@ var searchDescription = args.join(" ");
             console.log("Spotify preview link: " + data.tracks.items[i].preview_url);
             console.log("Album: " + data.tracks.items[i].album.name);
         }
+
+        // If no song is provided then your program will default to "The Sign" by Ace of Base.
     });
-// }
+}
+
+
+// OMDB MOVIE SEARCH
+// node liri.js movie-this '<movie name here>'
+
+// This will output the following information to your terminal/bash window:
+//    * Title of the movie.
+//    * Year the movie came out.
+//    * IMDB Rating of the movie.
+//    * Rotten Tomatoes Rating of the movie.
+//    * Country where the movie was produced.
+//    * Language of the movie.
+//    * Plot of the movie.
+//    * Actors in the movie.
+
+function movieSearch() {
+
+    // Then run a request with axios to the OMDB API with the movie specified
+    var omdbURL = "http://www.omdbapi.com/?t=" + userInputTrucated + "&apikey=trilogy";
+
+    // This line is just to help us debug against the actual URL.
+    console.log(omdbURL);
+
+    axios.get(omdbURL).then(
+        function (response) {
+            console.log("Movie title: " + response.data.Title);
+            console.log("Year: " + response.data.Year);
+            console.log("IMDB rating: " + response.data.imdbRating);
+            for (i = 0; i < response.data.imdbRating.length; i++) {
+                if (response.data.Ratings[i].Source === "Rotten Tomatoes") {
+                    // console.log(response.data.Ratings[i].Source);
+                    console.log("Rotten Tomatoes rating: " + response.data.Ratings[i].Value);
+                }
+            }
+            console.log("Country movie was produced: " + response.data.Country);
+            console.log("Language: " + response.data.Language);
+            console.log("Plot: " + response.data.Plot);
+            console.log("Actors: " + response.data.Actors);
+        })
+        .catch(function (error) {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                console.log("---------------Data---------------");
+                console.log(error.response.data);
+                console.log("---------------Status---------------");
+                console.log(error.response.status);
+                console.log("---------------Status---------------");
+                console.log(error.response.headers);
+            } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an object that comes back with details pertaining to the error that occurred.
+                console.log(error.request);
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log("Error", error.message);
+            }
+            console.log(error.config);
+
+            // If the user doesn't type a movie in, the program will output data for the movie 'Mr. Nobody.'
+            // If you haven't watched "Mr. Nobody," then you should: http://www.imdb.com/title/tt0485947/
+            // It's on Netflix!
+        });
+
+
+}
