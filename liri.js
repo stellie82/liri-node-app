@@ -1,18 +1,17 @@
 require("dotenv").config();
-
 const Spotify = require("node-spotify-api");
 const axios = require("axios");
 const keys = require("./key.js");
 const moment = require("moment");
-const file = require("file-system");
 const fs = require("fs");
-
+var omdbKey = keys.omdb.key;
 var spotify = new Spotify(keys.spotify);
 
 var searchType = process.argv[2];
 var args = process.argv.slice(3);
 var userInput = args.join(" ");
 var userInputTrucated = args.join("+");
+var logInfo = "\nSearch type: " + searchType + ", " + "Search description: " + userInput;
 console.log(args);
 console.log(userInput);
 console.log(userInputTrucated);
@@ -20,12 +19,15 @@ console.log(userInputTrucated);
 switch (searchType) {
     case "concert-this":
         concertSearch(userInputTrucated);
+        logInput(logInfo);
         break;
     case "spotify-this-song":
         songSearch(userInput);
+        logInput(logInfo);
         break;
     case "movie-this":
         movieSearch(userInputTrucated);
+        logInput(logInfo);
         break;
     case "do-what-it-says":
         doWhatItSays();
@@ -87,6 +89,10 @@ function concertSearch(userConcert) {
 // The album that the song is from
 
 function songSearch(userSong) {
+    // If no song is provided then your program will default to "The Sign" by Ace of Base.
+    if (!userSong) {
+        userSong = "The Sign Ace of Base";
+    }
     spotify.search({
         type: "track",
         query: userSong
@@ -104,7 +110,6 @@ function songSearch(userSong) {
             console.log("Album: " + data.tracks.items[i].album.name);
             console.log("----------------------------------------------------------");
         }
-        // If no song is provided then your program will default to "The Sign" by Ace of Base.
     });
 }
 
@@ -123,9 +128,11 @@ function songSearch(userSong) {
 //    * Actors in the movie.
 
 function movieSearch(userMovie) {
-
+    if (!userMovie) {
+        userMovie = "Mr. Nobody"
+    }
     // Then run a request with axios to the OMDB API with the movie specified
-    var omdbURL = "http://www.omdbapi.com/?t=" + userMovie + "&apikey=trilogy";
+    var omdbURL = "http://www.omdbapi.com/?t=" + userMovie + "&apikey=" + omdbKey;
 
     axios.get(omdbURL).then(
         function (response) {
@@ -213,6 +220,14 @@ function doWhatItSays() {
         // }
     });
 }
+
+function logInput(logText) {
+    fs.appendFile("log.txt", logText, function (err) {
+        if (err) throw err;
+        console.log("User input logged.");
+    });
+}
+
 
 
 // finish up default searches
