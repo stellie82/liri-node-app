@@ -16,9 +16,9 @@ var args = process.argv.slice(3);
 var userInput = args.join(" ");
 var userInputTrucated = args.join("+");
 var logInfo = "\nSearch type: " + searchType + ", " + "Search description: " + userInput;
-// console.log(args);
-// console.log(userInput);
-// console.log(userInputTrucated);
+console.log("User input: " + userInput);
+console.log("User input (URL): " + userInputTrucated);
+console.log("----------------------------------------------------------");
 
 // Function cases depending on what user chooses to lookup
 switch (searchType) {
@@ -62,6 +62,8 @@ function concertSearch(userConcert) {
                 console.log("----------------------------------------------------------");
             }
         })
+
+        // If there is an error output the following
         .catch(function (error) {
             if (error.response) {
                 console.log("---------------Data---------------");
@@ -88,7 +90,7 @@ function concertSearch(userConcert) {
 //    * The album that the song is from
 
 function songSearch(userSong) {
-    // If no song is provided then your program will default to "The Sign" by Ace of Base.
+    // If no song is provided then program will default to "The Sign" by Ace of Base
     if (!userSong) {
         userSong = "The Sign Ace of Base";
     }
@@ -96,6 +98,7 @@ function songSearch(userSong) {
         type: "track",
         query: userSong
     }, function (error, data) {
+        // If there is an error output the following
         if (error) {
             return console.log("Error occurred: " + error);
         }
@@ -148,6 +151,8 @@ function movieSearch(userMovie) {
             console.log("Plot: " + response.data.Plot);
             console.log("Actors: " + response.data.Actors);
         })
+        
+        // If there is an error output the following
         .catch(function (error) {
             if (error.response) {
                 // The request was made and the server responded with a status code
@@ -179,15 +184,18 @@ function movieSearch(userMovie) {
 function doWhatItSays() {
     // Read the existing random text file
     fs.readFile("random.txt", "utf8", function (error, data) {
+        // If there is an error output the following
         if (error) {
             return console.log("Error occurred: " + error);
         }
 
         data = data.split("\n");
+        // Choose a random index to output information
         let randomIndex = Math.floor(Math.random() * data.length);
         console.log("Randomly chosen index: " + randomIndex);
         let randomPicker = data[randomIndex].split(",");
         console.log("Search type: " + randomPicker[0] + ", " + "Search description: " + randomPicker[1]);
+        console.log("----------------------------------------------------------");
 
         let randomSearchType = randomPicker[0];
         let randomSearchDescription = randomPicker[1].replace(/\"/g, "");
@@ -211,9 +219,10 @@ function doWhatItSays() {
 // Function to log user input into a text file
 function logInput(logText) {
     fs.appendFile("log.txt", logText, function (error) {
+        // If there is an error output the following
         if (error) {
             return console.log("Error occurred: " + error);
         }
-        console.log("User input logged.");
+        console.log("User input logged");
     });
 }
