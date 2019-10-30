@@ -1,21 +1,26 @@
+// Required node modules and files
 require("dotenv").config();
 const Spotify = require("node-spotify-api");
 const axios = require("axios");
 const keys = require("./key.js");
 const moment = require("moment");
 const fs = require("fs");
+
+// API keys
 var omdbKey = keys.omdb.key;
 var spotify = new Spotify(keys.spotify);
 
+// Variables to store user input and search descriptions
 var searchType = process.argv[2];
 var args = process.argv.slice(3);
 var userInput = args.join(" ");
 var userInputTrucated = args.join("+");
 var logInfo = "\nSearch type: " + searchType + ", " + "Search description: " + userInput;
-console.log(args);
-console.log(userInput);
-console.log(userInputTrucated);
+// console.log(args);
+// console.log(userInput);
+// console.log(userInputTrucated);
 
+// Function cases depending on what user chooses to lookup
 switch (searchType) {
     case "concert-this":
         concertSearch(userInputTrucated);
@@ -35,18 +40,14 @@ switch (searchType) {
 }
 
 
+
 // BANDS IN TOWN CONCERT SEARCH
-// node liri.js concert-this <artist/band name here>
-// This will search the Bands in Town Artist Events API ("https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp") for an artist and render the following information about each event to the terminal:
-
-
-// Name of the venue
-// Venue location
-// Date of the Event (use moment to format this as "MM/DD/YYYY")
+//    * Name of the venue
+//    * Venue location
+//    * Date of the Event (use moment to format this as "MM/DD/YYYY")
 
 function concertSearch(userConcert) {
-
-    // Then run a request with axios to the OMDB API with the movie specified
+    // Run a request with Axios to the Bands in Town API with the concert artist specified
     var bandsInTownURL = "https://rest.bandsintown.com/artists/" + userConcert + "/events?app_id=codingbootcamp";
 
     axios.get(bandsInTownURL).then(
@@ -79,14 +80,12 @@ function concertSearch(userConcert) {
 }
 
 
-// SPOTIFY SONG SEARCH
-// node liri.js spotify-this-song '<song name here>'
-// This will show the following information about the song in your terminal/bash window
 
-// Artist(s)
-// The song's name
-// A preview link of the song from Spotify
-// The album that the song is from
+// SPOTIFY SONG SEARCH
+//    * Artist(s)
+//    * The song's name
+//    * A preview link of the song from Spotify
+//    * The album that the song is from
 
 function songSearch(userSong) {
     // If no song is provided then your program will default to "The Sign" by Ace of Base.
@@ -96,9 +95,9 @@ function songSearch(userSong) {
     spotify.search({
         type: "track",
         query: userSong
-    }, function (err, data) {
-        if (err) {
-            return console.log("Error occurred: " + err);
+    }, function (error, data) {
+        if (error) {
+            return console.log("Error occurred: " + error);
         }
 
         for (i = 0; i < data.tracks.items.length; i++) {
@@ -114,10 +113,8 @@ function songSearch(userSong) {
 }
 
 
-// OMDB MOVIE SEARCH
-// node liri.js movie-this '<movie name here>'
 
-// This will output the following information to your terminal/bash window:
+// OMDB MOVIE SEARCH
 //    * Title of the movie.
 //    * Year the movie came out.
 //    * IMDB Rating of the movie.
@@ -128,10 +125,11 @@ function songSearch(userSong) {
 //    * Actors in the movie.
 
 function movieSearch(userMovie) {
+    // If the user doesn't type a movie in, the program will output data for the movie 'Mr. Nobody.'
     if (!userMovie) {
         userMovie = "Mr. Nobody"
     }
-    // Then run a request with axios to the OMDB API with the movie specified
+    // Run a request with Axios to the OMDB API with the movie specified
     var omdbURL = "http://www.omdbapi.com/?t=" + userMovie + "&apikey=" + omdbKey;
 
     axios.get(omdbURL).then(
@@ -169,43 +167,33 @@ function movieSearch(userMovie) {
                 console.log("Error", error.message);
             }
             console.log(error.config);
-
-            // If the user doesn't type a movie in, the program will output data for the movie 'Mr. Nobody.'
-            // If you haven't watched "Mr. Nobody," then you should: http://www.imdb.com/title/tt0485947/
-            // It's on Netflix!
         });
 }
 
 
 
 // DO WHAT LIRI SAYS
-// node liri.js do-what-it-says
-// Using the fs Node package, LIRI will take the text inside of random.txt and then use it to call one of LIRI's commands.
-
-// It should run spotify-this-song for "I Want it That Way," as follows the text in random.txt.
-// Edit the text in random.txt to test out the feature for movie-this and concert-this.
+//    * It should run spotify-this-song for "I Want it That Way," as follows the text in random.txt.
+//    * Edit the text in random.txt to test out the feature for movie-this and concert-this.
 
 function doWhatItSays() {
-    // We will read the existing bank file
-    fs.readFile("random.txt", "utf8", function (err, data) {
-        if (err) {
-            return console.log(err);
+    // Read the existing random text file
+    fs.readFile("random.txt", "utf8", function (error, data) {
+        if (error) {
+            return console.log("Error occurred: " + error);
         }
-        // console.log(data);
+
         data = data.split("\n");
-        console.log(data);
-        console.log(data.length);
-
         let randomIndex = Math.floor(Math.random() * data.length);
-        console.log(randomIndex);
-
-        // for (i = 0; i < data.length; i++) {
+        console.log("Randomly chosen index: " + randomIndex);
         let randomPicker = data[randomIndex].split(",");
-        console.log(randomPicker);
+        console.log("Search type: " + randomPicker[0] + ", " + "Search description: " + randomPicker[1]);
+
         let randomSearchType = randomPicker[0];
         let randomSearchDescription = randomPicker[1].replace(/\"/g, "");
         let randomSearchTruncated = randomPicker[1].replace(/ /g, "+").replace(/\"/g, "");
 
+        // Function cases depending on what search type and description is randomly chosen
         switch (randomSearchType) {
             case "concert-this":
                 concertSearch(randomSearchTruncated);
@@ -217,20 +205,15 @@ function doWhatItSays() {
                 movieSearch(randomSearchTruncated);
                 break;
         }
-        // }
     });
 }
 
+// Function to log user input into a text file
 function logInput(logText) {
-    fs.appendFile("log.txt", logText, function (err) {
-        if (err) throw err;
+    fs.appendFile("log.txt", logText, function (error) {
+        if (error) {
+            return console.log("Error occurred: " + error);
+        }
         console.log("User input logged.");
     });
 }
-
-
-
-// finish up default searches
-// omdb key
-// errors
-// comments
