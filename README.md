@@ -1,4 +1,4 @@
-# LIRI Bot [GitHub](https://github.com/stellie82/liri-node-app.git)
+# LIRI Bot
 
 LIRI is a Language Interpretation and Recognition Interface.  The LIRI bot app runs as a command line node app and uses input parameters to output information for any _one_ of the following commands:
 * concert-this  `node liri.js concert-this <artist/band name here>`
@@ -71,3 +71,5 @@ User input is also logged to the log.txt file to capture each search type and de
   * Spotify API
   * OMDB API
   * Bands in Town API
+ 
+[LIRI Bot App](https://github.com/stellie82/liri-node-app.git)
