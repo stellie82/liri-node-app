@@ -1,9 +1,6 @@
 
-Search type: spotify-this-song, Search description: africa
-Search type: spotify-this-song, Search description: africa
-Search type: concert-this, Search description: backstreet boys
+Search type: concert-this, Search description: sting
 Search type: spotify-this-song, Search description: africa
 Search type: movie-this, Search description: top gun
-Search type: concert-this, Search description: backstreet boys
-Search type: spotify-this-song, Search description: africa
-Search type: movie-this, Search description: top gun
+Search type: spotify-this-song, Search description: 
+Search type: movie-this, Search description: 
