@@ -36,7 +36,7 @@ LIRI is a Language Interpretation and Recognition Interface.  The LIRI bot app r
 ## Code and Results
 
 A Switch statement is used to obtain the user's CLI.  LIRI then runs the specific block of code to output the relevant information back to the user.
-![switch statement](https://github.com/stellie82/liri-node-app/blob/master/screenshots/switch.png)
+![switch statement](https://github.com/stellie82/liri-node-app/blob/master/screenshots/switch.png?raw=true)
 
 ### Concert Search
 ![concertSearch](https://github.com/stellie82/liri-node-app/blob/master/screenshots/concertSearch.png?raw=true)
