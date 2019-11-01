@@ -53,9 +53,10 @@ A Switch statement is used to obtain the user's CLI.  LIRI then runs the specifi
 ## Required Files
 
 LIRI requires installation of several Node packages and links to local files, including:
-* axios
-* dotenv
-* Node Spotify API
+* axios: `npm install axios`
+* dotenv: `npm install dotenv`
+* Node Spotify API: `npm install --save node-spotify-api`
+* package.json file: `npm init -y`
 
 ![files](https://github.com/stellie82/liri-node-app/blob/master/screenshots/files.png?raw=true)
 
